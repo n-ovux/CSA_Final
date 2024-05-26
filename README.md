@@ -2,8 +2,8 @@
 This is my final for my CSA class
 
 ## Building
-Linux:\\
-`./gradlew`\\
+Linux:  
+`./gradlew`  
 
-Windows:\\
-`gradlew`\\
+Windows:  
+`gradlew`  
