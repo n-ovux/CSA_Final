@@ -1,7 +1,14 @@
 package project;
 
+import org.lwjgl.system.*;
+
 import java.io.*;
+import java.nio.*;
+
+import org.joml.*;
+
 import static org.lwjgl.opengl.GL43.*;
+import static org.lwjgl.system.MemoryUtil.*;
 
 public class Shader {
   private int Id;
@@ -46,6 +53,28 @@ public class Shader {
 
   public int getId() {
     return Id;
+  }
+
+  public void setInt(String name, int value) {
+    glUniform1i(getUniformLocation(name), value);
+  }
+
+  public void setFloat(String name, float value) {
+    glUniform1f(getUniformLocation(name), value);
+  }
+
+  public void setMatrix4(String name, Matrix4f matrix) {
+    FloatBuffer matrixBuffer = MemoryUtil.memAllocFloat(4*4);
+    matrix.get(matrixBuffer);
+    glUniformMatrix4fv(getUniformLocation(name), false, matrixBuffer);
+    memFree(matrixBuffer);
+  }
+
+  private int getUniformLocation(String name) {
+    int location = glGetUniformLocation(Id, name);
+    if (location < 0)
+      Logger.error("failed to find uniform: " + name);
+    return location;
   }
 
   private void linkProgram() {

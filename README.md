@@ -10,3 +10,9 @@ Linux:
 Windows:  
 `gradlew`  
 `gradlew run`
+
+## Resouces used
+[https://learnopengl.com/Introduction](https://learnopengl.com/Introduction)  
+[https://ahbejarano.gitbook.io/lwjglgamedev](https://ahbejarano.gitbook.io/lwjglgamedev)  
+[https://docs.gl/](https://docs.gl/)  
+
