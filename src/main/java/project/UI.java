@@ -18,14 +18,7 @@ public class UI {
   private int width = 1400;
   private int height = 900;
   private double deltaTime;
-  private float lastX;
-  private float lastY;
-  private float yaw;
-  private float pitch;
-  private boolean firstMouse = true;
-  private Vector3f cameraPosition;
-  private Vector3f cameraFront;
-  private Vector3f cameraUp;
+  private Camera camera;
 
   public void run() {
     init();
@@ -47,7 +40,6 @@ public class UI {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-
     window = glfwCreateWindow(width, height, "OpenGL Testing", NULL, NULL);
     if (window == NULL)
       Logger.error("failed to create window");
@@ -68,41 +60,11 @@ public class UI {
     });
 
     glfwSetCursorPosCallback(window, (window, xpos, ypos) -> {
-      if (firstMouse) {
-        lastX = (float) xpos;
-        lastY = (float) ypos;
-        firstMouse = false;
-      }
-
-      float xoffset = (float) xpos - lastX;
-      float yoffset = lastY - (float) ypos;
-      lastX = (float) xpos;
-      lastY = (float) ypos;
-
-      float sensitivity = 0.09f;
-      xoffset *= sensitivity;
-      yoffset *= sensitivity;
-
-      yaw += xoffset;
-      pitch += yoffset;
-
-      if (pitch > 89.0f)
-        pitch = 89.0f;
-      if (pitch < -89.0f)
-        pitch = -89.0f;
-
-      Vector3f direction = new Vector3f();
-      direction.setComponent(0, (float) (Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch))));
-      direction.setComponent(1, (float) (Math.sin(Math.toRadians(pitch))));
-      direction.setComponent(2, (float) ((Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch))));
-      cameraFront = direction.normalize();
+      camera.updateCamera((float) xpos, (float) ypos);
     });
   }
 
   private void processInput() {
-    float cameraSpeed = 5.0f * (float) deltaTime;
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-      cameraSpeed *= 0.5;
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
     }
@@ -112,22 +74,24 @@ public class UI {
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      cameraPosition.add(new Vector3f(cameraFront).mul(cameraSpeed));
+      camera.move(Camera.Direction.FORWARD, (float) deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      cameraPosition.sub(new Vector3f(cameraFront).mul(cameraSpeed));
+      camera.move(Camera.Direction.BACKWARD, (float) deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-      cameraPosition.sub(new Vector3f(cameraFront).cross(cameraUp).normalize().mul(cameraSpeed));
+      camera.move(Camera.Direction.LEFT, (float) deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-      cameraPosition.add(new Vector3f(cameraFront).cross(cameraUp).normalize().mul(cameraSpeed));
+      camera.move(Camera.Direction.RIGHT, (float) deltaTime);
     }
   }
 
   private void loop() {
     glViewport(0, 0, width, height);
     glEnable(GL_DEPTH_TEST);
+
+    camera = new Camera(0.0f, 0.0f, 3.0f, 5.0f);
 
     float quadVerts[] = new float[] {
         -1.0f, -1.0f, -5.0f, 0.0f, 0.0f,
@@ -226,10 +190,6 @@ public class UI {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     cubevao.unbind();
 
-    cameraPosition = new Vector3f(0.0f, 0.0f, 3.0f);
-    cameraFront = new Vector3f(0.0f, 0.0f, -1.0f);
-    cameraUp = new Vector3f(0.0f, 1.0f, 0.0f);
-
     double lastTime = glfwGetTime();
     int newFrames = 0;
     while (!glfwWindowShouldClose(window)) {
@@ -251,7 +211,7 @@ public class UI {
 
       Matrix4f model = new Matrix4f();
       Matrix4f view = new Matrix4f();
-      view.lookAt(cameraPosition, new Vector3f(cameraPosition).add(cameraFront), cameraUp);
+      view.mul(camera.getLook());
       Matrix4f projection = new Matrix4f();
       projection.setPerspective((float) Math.toRadians(60.0), (float) width / height, 0.01f, 100.0f);
 
