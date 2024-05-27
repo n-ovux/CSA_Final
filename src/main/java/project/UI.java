@@ -89,15 +89,14 @@ public class UI {
 
   private void loop() {
     glViewport(0, 0, width, height);
-    glEnable(GL_DEPTH_TEST);
 
     camera = new Camera(0.0f, 0.0f, 3.0f, 5.0f);
 
     float quadVerts[] = new float[] {
-        -1.0f, -1.0f, -5.0f, 0.0f, 0.0f,
-        -1.0f, 1.0f, -3.0f, 0.0f, 1.0f,
-        1.0f, -1.0f, -5.0f, 1.0f, 0.0f,
-        1.0f, 1.0f, -3.0f, 1.0f, 1.0f
+        -1.0f, -1.0f, 0.0f,
+        -1.0f, 1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,
+        1.0f, 1.0f, 0.0f,
     };
     FloatBuffer quadVertsBuffer = MemoryUtil.memAllocFloat(quadVerts.length);
     quadVertsBuffer.put(quadVerts).flip();
@@ -109,8 +108,8 @@ public class UI {
     IntBuffer quadIndsBuffer = MemoryUtil.memAllocInt(quadInds.length);
     quadIndsBuffer.put(quadInds).flip();
 
-    int quadvao = glGenVertexArrays();
-    glBindVertexArray(quadvao);
+    VertexArray quadvao = new VertexArray();
+    quadvao.bind();
 
     int quadvbo = glGenBuffers();
     glBindBuffer(GL_ARRAY_BUFFER, quadvbo);
@@ -122,14 +121,14 @@ public class UI {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndsBuffer, GL_STATIC_DRAW);
     memFree(quadIndsBuffer);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, (3 + 2) * 4, 0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, false, (3 + 2) * 4, 3 * 4);
+    quadvao.push(3);
+    quadvao.enable();
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    quadvao.unbind();
 
-    Shader quadShader = new Shader("quad.vert", "quad.frag");
+    Shader quadShader = new Shader("default.vert", "default.frag");
+
+    Shader textureShader = new Shader("texture.vert", "texture.frag");
     Texture container = new Texture("container.png");
     float cubeVerts[] = new float[] {
         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
@@ -207,22 +206,34 @@ public class UI {
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      quadShader.bind();
-
       Matrix4f model = new Matrix4f();
       Matrix4f view = new Matrix4f();
       view.mul(camera.getLook());
       Matrix4f projection = new Matrix4f();
       projection.setPerspective((float) Math.toRadians(60.0), (float) width / height, 0.01f, 100.0f);
 
-      quadShader.setMatrix4("projection", projection);
-      quadShader.setMatrix4("model", model);
-      quadShader.setMatrix4("view", view);
-
+      glEnable(GL_DEPTH_TEST);
+      textureShader.bind();
+      textureShader.setMatrix4("projection", projection);
+      textureShader.setMatrix4("model", model);
+      textureShader.setMatrix4("view", view);
       container.bind();
       cubevao.bind();
       glDrawArrays(GL_TRIANGLES, 0, 36);
       container.unbind();
+      textureShader.unbind();
+      cubevao.unbind();
+
+      model.scale(5.0f, 1.0f, 5.0f);
+      model.rotate((float) Math.toRadians(90), 1.0f, 0.0f, 0.0f);
+      model.translate(0.0f, 0.0f, 0.5f);
+      quadShader.bind();
+      quadShader.setMatrix4("projection", projection);
+      quadShader.setMatrix4("model", model);
+      quadShader.setMatrix4("view", view);
+      quadvao.bind();
+      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+      quadvao.unbind();
       quadShader.unbind();
 
       glfwSwapBuffers(window);
