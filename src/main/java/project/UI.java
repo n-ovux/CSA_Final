@@ -94,19 +94,12 @@ public class UI {
 
     float quadVerts[] = new float[] {
         -1.0f, -1.0f, 0.0f,
-        -1.0f, 1.0f, 0.0f,
         1.0f, -1.0f, 0.0f,
         1.0f, 1.0f, 0.0f,
+        -1.0f, 1.0f, 0.0f,
     };
     FloatBuffer quadVertsBuffer = MemoryUtil.memAllocFloat(quadVerts.length);
     quadVertsBuffer.put(quadVerts).flip();
-
-    int quadInds[] = new int[] {
-        0, 1, 2,
-        1, 2, 3
-    };
-    IntBuffer quadIndsBuffer = MemoryUtil.memAllocInt(quadInds.length);
-    quadIndsBuffer.put(quadInds).flip();
 
     VertexArray quadvao = new VertexArray();
     quadvao.bind();
@@ -116,12 +109,7 @@ public class UI {
     glBufferData(GL_ARRAY_BUFFER, quadVertsBuffer, GL_STATIC_DRAW);
     memFree(quadVertsBuffer);
 
-    int quadebo = glGenBuffers();
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndsBuffer, GL_STATIC_DRAW);
-    memFree(quadIndsBuffer);
-
-    quadvao.push(3);
+    quadvao.push(3, GL_FLOAT);
     quadvao.enable();
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     quadvao.unbind();
@@ -183,11 +171,13 @@ public class UI {
     glBindBuffer(GL_ARRAY_BUFFER, cubevbo);
     glBufferData(GL_ARRAY_BUFFER, cubeVertsBuffer, GL_STATIC_DRAW);
 
-    cubevao.push(3);
-    cubevao.push(2);
+    cubevao.push(3, GL_FLOAT);
+    cubevao.push(2, GL_FLOAT);
     cubevao.enable();
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     cubevao.unbind();
+
+    Shader tess = new Shader("default.vert", "default.frag", "tessellation.tesc", "tessellation.tese");
 
     double lastTime = glfwGetTime();
     int newFrames = 0;
@@ -227,14 +217,15 @@ public class UI {
       model.scale(5.0f, 1.0f, 5.0f);
       model.rotate((float) Math.toRadians(90), 1.0f, 0.0f, 0.0f);
       model.translate(0.0f, 0.0f, 0.5f);
-      quadShader.bind();
-      quadShader.setMatrix4("projection", projection);
-      quadShader.setMatrix4("model", model);
-      quadShader.setMatrix4("view", view);
+      tess.bind();
+      tess.setMatrix4("projection", projection);
+      tess.setMatrix4("model", model);
+      tess.setMatrix4("view", view);
       quadvao.bind();
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+      glPatchParameteri(GL_PATCH_VERTICES, 4);
+      glDrawArrays(GL_PATCHES, 0, 4);
       quadvao.unbind();
-      quadShader.unbind();
+      tess.unbind();
 
       glfwSwapBuffers(window);
       glfwPollEvents();

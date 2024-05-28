@@ -13,32 +13,42 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class Shader {
   private int Id;
 
-  // This one is for a pipeline shader
   public Shader(String vertexSource, String fragmentSource) {
-    String vertexShaderSource = getSourceString("shaders/" + vertexSource);
-    String fragmentShaderSource = getSourceString("shaders/" + fragmentSource);
-
     Id = glCreateProgram();
     if (Id == 0)
       Logger.error("failed to create shader program");
 
-    int vertexShaderId = createShader(vertexShaderSource, GL_VERTEX_SHADER);
-    int fragmentShaderId = createShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
+    int vertexShaderId = createShader(getSourceString("shaders/" + vertexSource), GL_VERTEX_SHADER);
+    int fragmentShaderId = createShader(getSourceString("shaders/" + fragmentSource), GL_FRAGMENT_SHADER);
     glAttachShader(Id, vertexShaderId);
     glAttachShader(Id, fragmentShaderId);
     
     linkProgram();
   }
   
-  // This one is for compute shaders
-  public Shader(String computeSource) {
-    String computeShaderSource = getSourceString("shaders/" + computeSource);
+  public Shader(String vertexSource, String fragmentSource, String tessellationControlSource, String tessellationEvalSource) {
+    Id = glCreateProgram();
+    if (Id == 0)
+      Logger.error("failed to create shader program");
 
+    int vertexShaderId = createShader(getSourceString("shaders/" + vertexSource), GL_VERTEX_SHADER);
+    int fragmentShaderId = createShader(getSourceString("shaders/" + fragmentSource), GL_FRAGMENT_SHADER);
+    int tessellationControlShaderId = createShader(getSourceString("shaders/" + tessellationControlSource), GL_TESS_CONTROL_SHADER);
+    int tessellationEvalShaderId = createShader(getSourceString("shaders/" + tessellationEvalSource), GL_TESS_EVALUATION_SHADER);
+    glAttachShader(Id, vertexShaderId);
+    glAttachShader(Id, fragmentShaderId);
+    glAttachShader(Id, tessellationControlShaderId);
+    glAttachShader(Id, tessellationEvalShaderId);
+    
+    linkProgram();
+  }
+
+  public Shader(String computeSource) {
     Id = glCreateProgram();
     if (Id == 0)
       Logger.error("failed to create sahder program");
 
-    int computeShaderId = createShader(computeShaderSource, GL_COMPUTE_SHADER);
+    int computeShaderId = createShader(getSourceString("shaders/" + computeSource), GL_COMPUTE_SHADER);
     glAttachShader(Id, computeShaderId);
     linkProgram();
   }

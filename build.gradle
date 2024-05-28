@@ -30,16 +30,26 @@ switch (OperatingSystem.current()) {
 repositories {
 	mavenCentral()
 }
+
+// joml - math library with stuff like vectors and matrices
+// lwjgl - library that has java bindings to the libraries below:
+//   opengl - a graphics interface to render stuff with a gpu
+//   glfw - library for creating windows and handling input
+//   stb - library for loading images
+//   nuklear - library for making guis
 dependencies {
-	implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+  implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
 	implementation "org.lwjgl:lwjgl"
 	implementation "org.lwjgl:lwjgl-glfw"
+	implementation "org.lwjgl:lwjgl-nuklear"
 	implementation "org.lwjgl:lwjgl-opengl"
 	implementation "org.lwjgl:lwjgl-stb"
 	runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
 	runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+	runtimeOnly "org.lwjgl:lwjgl-nuklear::$lwjglNatives"
 	runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
 	runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+
 	implementation "org.joml:joml:${jomlVersion}"
 }
