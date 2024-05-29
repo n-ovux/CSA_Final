@@ -11,7 +11,16 @@ Windows:
 `gradlew`  
 `gradlew run`
 
-## Resouces used
+## Libraries Used
+joml - math library with stuff like vectors and matrices  
+lwjgl - library that has java bindings to the libraries below:  
+opengl - a graphics interface to render stuff with a gpu  
+glfw - library for creating windows and handling input  
+stb - library for loading images  
+imgui - library for making 2d guis  
+
+
+## Resouces
 [https://learnopengl.com/Introduction](https://learnopengl.com/Introduction)  
 [https://ahbejarano.gitbook.io/lwjglgamedev](https://ahbejarano.gitbook.io/lwjglgamedev)  
 [https://docs.gl/](https://docs.gl/)  
