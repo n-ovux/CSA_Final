@@ -17,8 +17,8 @@ public class Texture {
     Id = glGenTextures();
 
     try (MemoryStack stack = MemoryStack.stackPush()) {
-      IntBuffer w = stack.mallocInt(1);
-      IntBuffer h = stack.mallocInt(1);
+      IntBuffer w = stack.callocInt(1);
+      IntBuffer h = stack.callocInt(1);
       IntBuffer channels = stack.mallocInt(1);
 
       ByteBuffer imageBuffer = stbi_load(path, w, h, channels, 4);

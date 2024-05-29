@@ -1,6 +1,8 @@
 package project;
 
 import org.lwjgl.system.*;
+import org.lwjgl.system.MemoryUtil.*;
+import org.lwjgl.system.MemoryStack.*;
 
 import java.io.*;
 import java.nio.*;
@@ -9,6 +11,7 @@ import org.joml.*;
 
 import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryStack.*;
 
 public class Shader {
   private int Id;
@@ -22,24 +25,27 @@ public class Shader {
     int fragmentShaderId = createShader(getSourceString("shaders/" + fragmentSource), GL_FRAGMENT_SHADER);
     glAttachShader(Id, vertexShaderId);
     glAttachShader(Id, fragmentShaderId);
-    
+
     linkProgram();
   }
-  
-  public Shader(String vertexSource, String fragmentSource, String tessellationControlSource, String tessellationEvalSource) {
+
+  public Shader(String vertexSource, String fragmentSource, String tessellationControlSource,
+      String tessellationEvalSource) {
     Id = glCreateProgram();
     if (Id == 0)
       Logger.error("failed to create shader program");
 
     int vertexShaderId = createShader(getSourceString("shaders/" + vertexSource), GL_VERTEX_SHADER);
     int fragmentShaderId = createShader(getSourceString("shaders/" + fragmentSource), GL_FRAGMENT_SHADER);
-    int tessellationControlShaderId = createShader(getSourceString("shaders/" + tessellationControlSource), GL_TESS_CONTROL_SHADER);
-    int tessellationEvalShaderId = createShader(getSourceString("shaders/" + tessellationEvalSource), GL_TESS_EVALUATION_SHADER);
+    int tessellationControlShaderId = createShader(getSourceString("shaders/" + tessellationControlSource),
+        GL_TESS_CONTROL_SHADER);
+    int tessellationEvalShaderId = createShader(getSourceString("shaders/" + tessellationEvalSource),
+        GL_TESS_EVALUATION_SHADER);
     glAttachShader(Id, vertexShaderId);
     glAttachShader(Id, fragmentShaderId);
     glAttachShader(Id, tessellationControlShaderId);
     glAttachShader(Id, tessellationEvalShaderId);
-    
+
     linkProgram();
   }
 
@@ -74,10 +80,11 @@ public class Shader {
   }
 
   public void setMatrix4(String name, Matrix4f matrix) {
-    FloatBuffer matrixBuffer = MemoryUtil.memAllocFloat(4*4);
-    matrix.get(matrixBuffer);
-    glUniformMatrix4fv(getUniformLocation(name), false, matrixBuffer);
-    memFree(matrixBuffer);
+    try (MemoryStack stack = stackPush()) {
+      FloatBuffer matrixBuffer = stack.callocFloat(4 * 4);
+      matrix.get(matrixBuffer);
+      glUniformMatrix4fv(getUniformLocation(name), false, matrixBuffer);
+    }
   }
 
   private int getUniformLocation(String name) {

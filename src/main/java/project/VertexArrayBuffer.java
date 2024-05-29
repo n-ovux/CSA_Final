@@ -6,6 +6,7 @@ import java.nio.*;
 import org.lwjgl.system.*;
 
 import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.opengl.GL43.*;
 
 public class VertexArrayBuffer {
@@ -33,19 +34,19 @@ public class VertexArrayBuffer {
     for (int i = 0; i < elements.size(); i++) {
       glEnableVertexAttribArray(i);
       glVertexAttribPointer(i, elements.get(i), types.get(i), false, total, beforeTotal);
-      beforeTotal += elements.get(i)*typeToSize(types.get(i));
+      beforeTotal += elements.get(i) * typeToSize(types.get(i));
     }
   }
 
   public void addVerticesBuffer(float[] data) {
-    FloatBuffer dataBuffer = MemoryUtil.memAllocFloat(data.length);
-    dataBuffer.put(data).flip();
+    try (MemoryStack stack = stackPush()) {
+      FloatBuffer dataBuffer = stack.callocFloat(data.length);
+      dataBuffer.put(data).flip();
 
-    int vbo = glGenBuffers();
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, dataBuffer, GL_STATIC_DRAW);
-
-    memFree(dataBuffer);
+      int vbo = glGenBuffers();
+      glBindBuffer(GL_ARRAY_BUFFER, vbo);
+      glBufferData(GL_ARRAY_BUFFER, dataBuffer, GL_STATIC_DRAW);
+    }
   }
 
   private int typeToSize(int type) {

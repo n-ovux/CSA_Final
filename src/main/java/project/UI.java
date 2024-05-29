@@ -26,8 +26,6 @@ public class UI {
   public void run() {
     init();
     loop();
-
-    glfwTerminate();
   }
 
   private void init() {
@@ -93,7 +91,6 @@ public class UI {
         mouseFree = false;
       }
     }
-
   }
 
   private void loop() {
