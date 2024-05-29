@@ -27,6 +27,8 @@ public class Gui {
 
     ImGui.createContext();
     imguiIO = ImGui.getIO();
+    imguiIO.setIniFilename(null);
+    imguiIO.setLogFilename(null);
     imguiGlfw.init(window, true);
     imguiGl3.init();
 
@@ -50,6 +52,7 @@ public class Gui {
     int flags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
     
     ImGui.setNextWindowPos(1.0f, 1.0f);
+    ImGui.setNextWindowSize(300.0f, 100.0f);
     ImGui.begin("Information", flags);
     ImGui.text("fps: " + (int) fps);
     ImGui.text("mspf: " + mspf);

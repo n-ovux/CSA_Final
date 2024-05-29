@@ -1,15 +1,19 @@
 package project;
 
 import java.util.*;
+import java.nio.*;
 
+import org.lwjgl.system.*;
+
+import static org.lwjgl.system.MemoryUtil.*;
 import static org.lwjgl.opengl.GL43.*;
 
-public class VertexArray {
+public class VertexArrayBuffer {
   private int Id;
   private ArrayList<Integer> elements;
   private ArrayList<Integer> types;
 
-  public VertexArray() {
+  public VertexArrayBuffer() {
     Id = glGenVertexArrays();
     elements = new ArrayList<Integer>();
     types = new ArrayList<Integer>();
@@ -33,6 +37,17 @@ public class VertexArray {
     }
   }
 
+  public void addVerticesBuffer(float[] data) {
+    FloatBuffer dataBuffer = MemoryUtil.memAllocFloat(data.length);
+    dataBuffer.put(data).flip();
+
+    int vbo = glGenBuffers();
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, dataBuffer, GL_STATIC_DRAW);
+
+    memFree(dataBuffer);
+  }
+
   private int typeToSize(int type) {
     switch (type) {
       case GL_FLOAT:
@@ -53,9 +68,5 @@ public class VertexArray {
 
   public void bind() {
     glBindVertexArray(Id);
-  }
-
-  public void unbind() {
-    glBindVertexArray(0);
   }
 }

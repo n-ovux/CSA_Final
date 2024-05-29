@@ -10,6 +10,7 @@ public class Camera {
   private float yaw;
   private float pitch;
   private float speed;
+  private float fov;
   private boolean firstMouse;
   private Vector3f position;
   private Vector3f front;
@@ -22,14 +23,15 @@ public class Camera {
     RIGHT
   }
 
-  public Camera(float x, float y, float z, float speed) {
+  public Camera(float x, float y, float z, float fov) {
     position = new Vector3f(x, y, z);
     front = new Vector3f(0.0f, 0.0f, 0.0f);
     up = new Vector3f(0.0f, 1.0f, 0.0f);
     firstMouse = true;
     yaw = 0;
     pitch = 0;
-    this.speed = speed;
+    speed = 5;
+    this.fov = fov;
   }
 
   public void updateCamera(float mouseX, float mouseY) {
@@ -44,7 +46,7 @@ public class Camera {
       lastX = mouseX;
       lastY = mouseY;
 
-      float sensitivity = 0.09f;
+      float sensitivity = 0.1f;
       xoffset *= sensitivity;
       yoffset *= sensitivity;
 
@@ -91,5 +93,9 @@ public class Camera {
 
   public Matrix4f getLook() {
     return new Matrix4f().lookAt(position, new Vector3f(position).add(front), up);
+  }
+
+  public float getFov() {
+    return fov;
   }
 }
