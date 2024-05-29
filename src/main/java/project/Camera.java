@@ -33,39 +33,39 @@ public class Camera {
   }
 
   public void updateCamera(float mouseX, float mouseY) {
-    if (firstMouse) {
+      if (firstMouse) {
+        lastX = mouseX;
+        lastY = mouseY;
+        firstMouse = false;
+      }
+
+      float xoffset = mouseX - lastX;
+      float yoffset = lastY - mouseY;
       lastX = mouseX;
       lastY = mouseY;
-      firstMouse = false;
-    }
 
-    float xoffset = mouseX - lastX;
-    float yoffset = lastY - mouseY;
-    lastX = mouseX;
-    lastY = mouseY;
+      float sensitivity = 0.09f;
+      xoffset *= sensitivity;
+      yoffset *= sensitivity;
 
-    float sensitivity = 0.09f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
+      yaw += xoffset;
+      pitch += yoffset;
 
-    yaw += xoffset;
-    pitch += yoffset;
+      if (pitch > 89.0f)
+        pitch = 89.0f;
+      if (pitch < -89.0f)
+        pitch = -89.0f;
 
-    if (pitch > 89.0f)
-      pitch = 89.0f;
-    if (pitch < -89.0f)
-      pitch = -89.0f;
+      if (yaw > 360)
+        yaw = 0;
+      if (yaw < -360)
+        yaw = 0;
 
-    if (yaw > 360)
-      yaw = 0;
-    if (yaw < -360)
-      yaw = 0;
-
-    Vector3f direction = new Vector3f();
-    direction.setComponent(0, (float) (Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch))));
-    direction.setComponent(1, (float) (Math.sin(Math.toRadians(pitch))));
-    direction.setComponent(2, (float) (Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch))));
-    front = new Vector3f(direction.normalize());
+      Vector3f direction = new Vector3f();
+      direction.setComponent(0, (float) (Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch))));
+      direction.setComponent(1, (float) (Math.sin(Math.toRadians(pitch))));
+      direction.setComponent(2, (float) (Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch))));
+      front = new Vector3f(direction.normalize());
   }
 
   public void move(Direction direction, float deltaTime) {
@@ -83,6 +83,10 @@ public class Camera {
         position.add(new Vector3f(front).cross(up).normalize().mul(speed * deltaTime));
         break;
     }
+  }
+
+  public void setFirstMouse(boolean firstMouse) {
+    this.firstMouse = firstMouse;
   }
 
   public Matrix4f getLook() {

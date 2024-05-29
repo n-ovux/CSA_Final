@@ -16,6 +16,7 @@ jar {
 
 project.ext.lwjglVersion = "3.3.3"
 project.ext.jomlVersion = "1.10.5"
+project.ext.imguiVersion = "1.86.11"
 
 import org.gradle.internal.os.OperatingSystem
 switch (OperatingSystem.current()) {
@@ -36,20 +37,23 @@ repositories {
 //   opengl - a graphics interface to render stuff with a gpu
 //   glfw - library for creating windows and handling input
 //   stb - library for loading images
-//   nuklear - library for making guis
+//   imgui - library for making 2d guis
 dependencies {
   implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
 	implementation "org.lwjgl:lwjgl"
 	implementation "org.lwjgl:lwjgl-glfw"
-	implementation "org.lwjgl:lwjgl-nuklear"
 	implementation "org.lwjgl:lwjgl-opengl"
 	implementation "org.lwjgl:lwjgl-stb"
 	runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
 	runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
-	runtimeOnly "org.lwjgl:lwjgl-nuklear::$lwjglNatives"
 	runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
 	runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+
+  implementation "io.github.spair:imgui-java-binding:$imguiVersion"
+  implementation "io.github.spair:imgui-java-lwjgl3:$imguiVersion"
+    
+  implementation "io.github.spair:imgui-java-$lwjglNatives:$imguiVersion"
 
 	implementation "org.joml:joml:${jomlVersion}"
 }

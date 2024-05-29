@@ -19,6 +19,8 @@ public class UI {
   private int height = 900;
   private double deltaTime;
   private Camera camera;
+  private Gui gui;
+  private boolean mouseFree = true;
 
   public void run() {
     init();
@@ -44,13 +46,15 @@ public class UI {
     if (window == NULL)
       Logger.error("failed to create window");
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
     glfwShowWindow(window);
 
     GL.createCapabilities();
+
+    gui = new Gui(window);
 
     // Callbacks
     glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
@@ -60,30 +64,40 @@ public class UI {
     });
 
     glfwSetCursorPosCallback(window, (window, xpos, ypos) -> {
-      camera.updateCamera((float) xpos, (float) ypos);
+      if (!gui.captureMouse() && !mouseFree) {
+        camera.updateCamera((float) xpos, (float) ypos);
+      }
+    });
+
+    glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
+      if (!gui.captureMouse()) {
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+          mouseFree = false;
+        }
+      }
     });
   }
 
   private void processInput() {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-      glfwSetWindowShouldClose(window, true);
-    }
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE) {
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      camera.move(Camera.Direction.FORWARD, (float) deltaTime);
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      camera.move(Camera.Direction.BACKWARD, (float) deltaTime);
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-      camera.move(Camera.Direction.LEFT, (float) deltaTime);
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-      camera.move(Camera.Direction.RIGHT, (float) deltaTime);
+    if (!gui.captureKeyboard()) {
+      if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        mouseFree = true;
+        camera.setFirstMouse(true);
+      }
+      if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        camera.move(Camera.Direction.FORWARD, (float) deltaTime);
+      }
+      if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        camera.move(Camera.Direction.BACKWARD, (float) deltaTime);
+      }
+      if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        camera.move(Camera.Direction.LEFT, (float) deltaTime);
+      }
+      if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        camera.move(Camera.Direction.RIGHT, (float) deltaTime);
+      }
     }
   }
 
@@ -114,7 +128,7 @@ public class UI {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     quadvao.unbind();
 
-    Shader quadShader = new Shader("default.vert", "default.frag");
+    Shader defaultShader = new Shader("default.vert", "default.frag");
 
     Shader textureShader = new Shader("texture.vert", "texture.frag");
     Texture container = new Texture("container.png");
@@ -181,12 +195,15 @@ public class UI {
 
     double lastTime = glfwGetTime();
     int newFrames = 0;
+    float fps = 0;
+    float mspf = 0;
     while (!glfwWindowShouldClose(window)) {
       double currentTime = glfwGetTime();
       newFrames++;
       deltaTime = currentTime - lastTime;
       if (deltaTime <= 1.0) {
-        System.out.printf("\r%.4f fps | %.4f mspf", newFrames / deltaTime, (deltaTime * 1000.0) / newFrames);
+        fps = (float) (newFrames / deltaTime);
+        mspf = (float) (deltaTime * 1000.0) / newFrames;
         newFrames = 0;
         lastTime = currentTime;
       }
@@ -195,6 +212,15 @@ public class UI {
 
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      if(gui.getWireframe()) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      }
+
+      gui.setStatusVariables(fps, mspf);
+      gui.render();
 
       Matrix4f model = new Matrix4f();
       Matrix4f view = new Matrix4f();
@@ -218,6 +244,7 @@ public class UI {
       model.rotate((float) Math.toRadians(90), 1.0f, 0.0f, 0.0f);
       model.translate(0.0f, 0.0f, 0.5f);
       tess.bind();
+      tess.setFloat("subdivisions", gui.getSubdivisions());
       tess.setMatrix4("projection", projection);
       tess.setMatrix4("model", model);
       tess.setMatrix4("view", view);
@@ -226,6 +253,9 @@ public class UI {
       glDrawArrays(GL_PATCHES, 0, 4);
       quadvao.unbind();
       tess.unbind();
+
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      gui.drawWindow();
 
       glfwSwapBuffers(window);
       glfwPollEvents();
