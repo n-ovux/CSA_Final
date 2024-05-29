@@ -30,7 +30,7 @@ public class Camera {
     firstMouse = true;
     yaw = 0;
     pitch = 0;
-    speed = 5;
+    speed = 0.25f;
     this.fov = fov;
   }
 

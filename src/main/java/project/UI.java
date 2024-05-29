@@ -103,11 +103,11 @@ public class UI {
         -1.0f, 1.0f, 0.0f,
     };
 
-    VertexArrayBuffer planeVao = new VertexArrayBuffer();
-    planeVao.bind();
-    planeVao.addVerticesBuffer(planeVertices);
-    planeVao.push(3, GL_FLOAT);
-    planeVao.enable();
+    VertexArrayBuffer planeVab = new VertexArrayBuffer();
+    planeVab.bind();
+    planeVab.addVerticesBuffer(planeVertices);
+    planeVab.addVertexAttribute(3, GL_FLOAT);
+    planeVab.enableVertexAttributes();
 
     Shader tessShader = new Shader("default.vert", "default.frag", "tessellation.tesc", "tessellation.tese");
 
@@ -119,7 +119,7 @@ public class UI {
       double currentTime = glfwGetTime();
       newFrames++;
       deltaTime = currentTime - lastTime;
-      if (deltaTime <= 1.0) {
+      if (deltaTime >= 1.0) {
         fps = (float) (newFrames / deltaTime);
         mspf = (float) (deltaTime * 1000.0) / newFrames;
         newFrames = 0;
@@ -152,10 +152,10 @@ public class UI {
 
       tessShader.bind();
       tessShader.setFloat("subdivisions", gui.getSubdivisions());
-      tessShader.setMatrix4("projection", projection);
       tessShader.setMatrix4("model", model);
       tessShader.setMatrix4("view", view);
-      planeVao.bind();
+      tessShader.setMatrix4("projection", projection);
+      planeVab.bind();
       glPatchParameteri(GL_PATCH_VERTICES, 4);
       glDrawArrays(GL_PATCHES, 0, 4);
 

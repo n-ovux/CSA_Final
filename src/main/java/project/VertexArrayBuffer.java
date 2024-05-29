@@ -5,7 +5,6 @@ import java.nio.*;
 
 import org.lwjgl.system.*;
 
-import static org.lwjgl.system.MemoryUtil.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.opengl.GL43.*;
 
@@ -20,12 +19,12 @@ public class VertexArrayBuffer {
     types = new ArrayList<Integer>();
   }
 
-  public void push(int amount, int type) {
+  public void addVertexAttribute(int amount, int type) {
     elements.add(amount);
     types.add(type);
   }
 
-  public void enable() {
+  public void enableVertexAttributes() {
     int total = 0;
     for (int i = 0; i < elements.size(); i++)
       total += elements.get(i) * typeToSize(types.get(i));
