@@ -44,12 +44,12 @@ public class Perlin {
     return null;
   }
 
-  private float fade(float x) {
-    return ((6 * x - 15) * x + 10) * x * x * x;
+  private float smoothStep(float t) {
+    return ((6 * t - 15) * t + 10) * t * t * t;
   }
 
   private float lerp(float t, float value1, float value2) {
-    return value1 * (1 - t) + t * value2;
+    return value1 + t * (value2 - value1);
   }
 
   public float sample(float x, float y) {
@@ -74,8 +74,8 @@ public class Perlin {
     float dotBottomRight = bottomRight.dot(getConstantVector(valueBottomRight));
     float dotBottomLeft = bottomLeft.dot(getConstantVector(valueBottomLeft));
 
-    float u = fade(xFractional);
-    float v = fade(yFractional);
+    float u = smoothStep(xFractional);
+    float v = smoothStep(yFractional);
 
     return lerp(u, lerp(v, dotBottomLeft, dotTopLeft), lerp(v, dotBottomRight, dotTopRight));
   }

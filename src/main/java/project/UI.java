@@ -10,7 +10,8 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL43.*; import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.opengl.GL43.*; 
+import static org.lwjgl.system.MemoryUtil.*;
 
 public class UI {
   private long window;
