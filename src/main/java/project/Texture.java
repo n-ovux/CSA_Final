@@ -78,7 +78,8 @@ public class Texture {
     glBindTexture(GL_TEXTURE_2D, 0);
   }
 
-  public void bind() {
+  public void bind(int textureUnit) {
+    glActiveTexture(textureUnit);
     glBindTexture(GL_TEXTURE_2D, Id);
   }
 

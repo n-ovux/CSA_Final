@@ -95,15 +95,17 @@ public class Perlin {
   }
 
   public Texture generateTexture(int size, float freq, int octaves) {
-    float[] pixels = new float[size * size];
-    for (int column = 0; column < size; column++) {
-      for (int row = 0; row < size; row++) {
+    float[] pixels = new float[size * size * 3];
+    for (int column = 0; column < size * 3; column += 3) {
+      for (int row = 0; row < size * 3; row += 3) {
         float value = fractalBrownianMotion(row, column, freq, octaves);
         value = (value + 1) / 2.0f;
         pixels[column * size + row] = value;
+        pixels[column * size + row + 1] = value;
+        pixels[column * size + row + 2] = value;
       }
     }
 
-    return new Texture(size, size, GL_RED, GL_FLOAT, pixels, GL_LINEAR);
+    return new Texture(size, size, GL_RGB, GL_FLOAT, pixels, GL_LINEAR);
   }
 }

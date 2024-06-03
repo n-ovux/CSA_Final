@@ -34,7 +34,7 @@ void main()
     vec4 rightPos = pos1 + v * (pos2 - pos1);
     vec4 pos = leftPos + u * (rightPos - leftPos);
 
-    float height = texture(heightMap, texCoord).r;
+    float height = 1.0 - texture(heightMap, texCoord).r;
     pos += vec4(0.0, 0.0, 10 * height, 0.0);
 
     gl_Position = projection * view * model * pos;

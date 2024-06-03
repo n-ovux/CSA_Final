@@ -26,3 +26,4 @@ imgui - library for making 2d guis
 [https://docs.gl/](https://docs.gl/)  
 [https://www.lwjgl.org/](https://www.lwjgl.org/)  
 [https://rtouti.github.io/graphics/perlin-noise-algorithm](https://rtouti.github.io/graphics/perlin-noise-algorithm)
+[https://www.khronos.org/opengl/wiki/](https://www.khronos.org/opengl/wiki/)

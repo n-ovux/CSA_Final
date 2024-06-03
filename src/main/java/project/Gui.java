@@ -3,6 +3,7 @@ package project;
 import java.util.Hashtable;
 
 import imgui.*;
+import imgui.flag.ImGuiSliderFlags;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.*;
 import imgui.glfw.ImGuiImplGlfw;
@@ -31,10 +32,11 @@ public class Gui {
     this.values = new Hashtable();
 
     values.put("subdivisions", new float[] { glGetFloat(GL_MAX_TESS_GEN_LEVEL) });
-    values.put("frequency", new float[] { 0.05f });
+    values.put("frequency", new float[] { 0.02f });
     values.put("wireframe", new ImBoolean(false));
     values.put("fps", Integer.valueOf(0));
     values.put("mspf", Float.valueOf(0.0f));
+    values.put("perlinNoise", Integer.valueOf(0));
   }
 
   public boolean captureMouse() {
@@ -49,17 +51,20 @@ public class Gui {
     imguiGlfw.newFrame();
     ImGui.newFrame();
 
+    // ImGui.showDemoWindow();
+
     int flags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove
         | ImGuiWindowFlags.NoResize;
 
     ImGui.setNextWindowPos(1.0f, 1.0f);
-    ImGui.setNextWindowSize(300.0f, 125.0f);
+    ImGui.setNextWindowSize(300.0f, 250.0f);
     ImGui.begin("Information", flags);
     ImGui.text("fps: " + values.get("fps"));
     ImGui.text("mspf: " + values.get("mspf"));
     ImGui.sliderFloat("subdivisions", (float[]) values.get("subdivisions"), 0.0f, glGetFloat(GL_MAX_TESS_GEN_LEVEL));
-    ImGui.sliderFloat("frequency", (float[]) values.get("frequency"), 0.0f, 1.0f);
+    ImGui.sliderFloat("frequency", (float[]) values.get("frequency"), 0.0f, 1.0f, "%.3f", ImGuiSliderFlags.Logarithmic);
     ImGui.checkbox("Wireframe", (ImBoolean) values.get("wireframe"));
+    ImGui.image(((Integer) values.get("perlinNoise")), 128.0f, 128.0f);
     ImGui.end();
   }
 

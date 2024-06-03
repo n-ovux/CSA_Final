@@ -156,8 +156,12 @@ public class UI {
       Matrix4f projection = new Matrix4f();
       projection.setPerspective((float) Math.toRadians(camera.getFov()), (float) width / height, 0.01f, 100.0f);
 
+      Texture noiseTexture = noise.generateTexture(128, ((float[]) gui.getValue("frequency"))[0], 5);
+      gui.setValue("perlinNoise", noiseTexture.getId());
+
       shader.bind();
-      noise.generateTexture(128, ((float[]) gui.getValue("frequency"))[0], 5).bind();
+      noiseTexture.bind(0);
+      shader.setInt("heightMap", 0);
       shader.setFloat("subdivisions", ((float[]) gui.getValue("subdivisions"))[0]);
       shader.setMatrix4("model", model);
       shader.setMatrix4("view", view);
