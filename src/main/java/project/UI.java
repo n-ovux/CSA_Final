@@ -157,7 +157,7 @@ public class UI {
       projection.setPerspective((float) Math.toRadians(camera.getFov()), (float) width / height, 0.01f, 100.0f);
 
       shader.bind();
-      noise.generateTexture(128, ((float[]) gui.getValue("frequency"))[0]).bind();
+      noise.generateTexture(128, ((float[]) gui.getValue("frequency"))[0], 5).bind();
       shader.setFloat("subdivisions", ((float[]) gui.getValue("subdivisions"))[0]);
       shader.setMatrix4("model", model);
       shader.setMatrix4("view", view);

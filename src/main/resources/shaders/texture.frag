@@ -8,5 +8,5 @@ in float eHeight;
 
 void main()
 {
-    fragColor = vec4(eHeight, eHeight, eHeight, 1.0);
+    fragColor = vec4(1 - eHeight, 1 - eHeight, 1 - eHeight, 1.0);
 }

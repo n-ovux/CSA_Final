@@ -52,7 +52,7 @@ public class Perlin {
     return value1 + t * (value2 - value1);
   }
 
-  public float sample(float x, float y) {
+  private float sample(float x, float y) {
     int X = (int) (Math.floor(x) % (permutations.length / 2));
     int Y = (int) (Math.floor(y) % (permutations.length / 2));
 
@@ -80,11 +80,25 @@ public class Perlin {
     return lerp(u, lerp(v, dotBottomLeft, dotTopLeft), lerp(v, dotBottomRight, dotTopRight));
   }
 
-  public Texture generateTexture(int size, float freq) {
+  private float fractalBrownianMotion(float x, float y, float freq, int octaves) {
+    float amplitude = 1.0f;
+    float result = 0.0f;
+
+    for (int i = 0; i < octaves; i++) {
+      result += amplitude * sample(x * freq, y * freq);
+
+      amplitude /= 2.f;
+      freq *= 2.0f;
+    }
+
+    return result;
+  }
+
+  public Texture generateTexture(int size, float freq, int octaves) {
     float[] pixels = new float[size * size];
     for (int column = 0; column < size; column++) {
       for (int row = 0; row < size; row++) {
-        float value = sample(row * freq, column * freq);
+        float value = fractalBrownianMotion(row, column, freq, octaves);
         value = (value + 1) / 2.0f;
         pixels[column * size + row] = value;
       }
