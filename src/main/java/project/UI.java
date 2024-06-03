@@ -145,7 +145,7 @@ public class UI {
       gui.render();
 
       Matrix4f model = new Matrix4f();
-      model.scale(5.0f, 1.0f, 5.0f);
+      model.scale(20.0f, 1.0f, 20.0f);
       model.rotate((float) Math.toRadians(90), 1.0f, 0.0f, 0.0f);
       model.translate(0.0f, 0.0f, 0.5f);
       Matrix4f view = new Matrix4f();

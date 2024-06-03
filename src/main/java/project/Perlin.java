@@ -90,6 +90,6 @@ public class Perlin {
       }
     }
 
-    return new Texture(size, size, GL_RED, GL_FLOAT, pixels);
+    return new Texture(size, size, GL_RED, GL_FLOAT, pixels, GL_LINEAR);
   }
 }

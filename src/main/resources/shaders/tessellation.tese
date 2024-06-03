@@ -9,7 +9,7 @@ uniform mat4 projection;
 
 in vec2 cTexCoord[];
 
-out vec2 eTexCoord;
+out float eHeight;
 
 void main()
 {
@@ -35,8 +35,8 @@ void main()
     vec4 pos = leftPos + u * (rightPos - leftPos);
 
     float height = texture(heightMap, texCoord).r;
-    pos += vec4(0.0, 0.0, height, 0.0);
+    pos += vec4(0.0, 0.0, 10*height, 0.0);
 
     gl_Position = projection * view * model * pos; // Matrix transformations go here
-    eTexCoord = texCoord;
+    eHeight = height;
 }

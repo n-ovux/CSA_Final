@@ -4,10 +4,9 @@ uniform sampler2D imageSampler;
 
 out vec4 fragColor;
 
-in vec2 eTexCoord;
+in float eHeight;
 
 void main()
 {
-  float value = texture(imageSampler, eTexCoord).r;
-  fragColor = vec4(value, value, value, 1.0);
+    fragColor = vec4(eHeight, eHeight, eHeight, 1.0);
 }

@@ -13,7 +13,7 @@ public class Texture {
   private int width;
   private int height;
 
-  public Texture(String path) {
+  public Texture(String path, int filter) {
     Id = glGenTextures();
 
     try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -32,8 +32,8 @@ public class Texture {
 
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer);
       glGenerateMipmap(GL_TEXTURE_2D);
@@ -42,7 +42,7 @@ public class Texture {
     glBindTexture(GL_TEXTURE_2D, 0);
   }
 
-  public Texture(int width, int height, int internalFormat, int format, int type) {
+  public Texture(int width, int height, int internalFormat, int format, int type, int filter) {
     this.width = width;
     this.height = height;
 
@@ -52,15 +52,15 @@ public class Texture {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, NULL);
 
     glBindTexture(GL_TEXTURE_2D, 0);
   }
 
-  public Texture(int width, int height, int format, int type, float[] pixels) {
+  public Texture(int width, int height, int format, int type, float[] pixels, int filter) {
     this.width = width;
     this.height = height;
 
@@ -70,8 +70,8 @@ public class Texture {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, type, pixels);
 
