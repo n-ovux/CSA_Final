@@ -1,5 +1,7 @@
 package project;
 
+import java.util.Hashtable;
+
 import imgui.*;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.*;
@@ -13,14 +15,7 @@ public class Gui {
   private ImGuiImplGl3 imguiGl3;
   private ImGuiIO imguiIO;
 
-  // Status Variables
-  private float fps;
-  private float mspf;
-  private float[] subdivisions = {1.0f};
-  private float[] frequency = {1.0f};
-
-  // Config Variables
-  private ImBoolean wireframe;
+  private Hashtable values;
 
   public Gui(long window) {
     imguiGlfw = new ImGuiImplGlfw();
@@ -33,7 +28,13 @@ public class Gui {
     imguiGlfw.init(window, true);
     imguiGl3.init();
 
-    wireframe = new ImBoolean(false);
+    this.values = new Hashtable();
+
+    values.put("subdivisions", new float[] { glGetFloat(GL_MAX_TESS_GEN_LEVEL) });
+    values.put("frequency", new float[] { 0.05f });
+    values.put("wireframe", new ImBoolean(false));
+    values.put("fps", Integer.valueOf(0));
+    values.put("mspf", Float.valueOf(0.0f));
   }
 
   public boolean captureMouse() {
@@ -48,36 +49,26 @@ public class Gui {
     imguiGlfw.newFrame();
     ImGui.newFrame();
 
-    // ImGui.showDemoWindow();
-  
-    int flags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
-    
+    int flags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove
+        | ImGuiWindowFlags.NoResize;
+
     ImGui.setNextWindowPos(1.0f, 1.0f);
-    ImGui.setNextWindowSize(300.0f, 200.0f);
+    ImGui.setNextWindowSize(300.0f, 125.0f);
     ImGui.begin("Information", flags);
-    ImGui.text("fps: " + (int) fps);
-    ImGui.text("mspf: " + mspf);
-    ImGui.sliderFloat("subdivisions", subdivisions, 0.0f, glGetFloat(GL_MAX_TESS_GEN_LEVEL));
-    ImGui.sliderFloat("frequency", frequency, 0.0f, 1.0f);
-    ImGui.checkbox("Wireframe", wireframe);
+    ImGui.text("fps: " + values.get("fps"));
+    ImGui.text("mspf: " + values.get("mspf"));
+    ImGui.sliderFloat("subdivisions", (float[]) values.get("subdivisions"), 0.0f, glGetFloat(GL_MAX_TESS_GEN_LEVEL));
+    ImGui.sliderFloat("frequency", (float[]) values.get("frequency"), 0.0f, 1.0f);
+    ImGui.checkbox("Wireframe", (ImBoolean) values.get("wireframe"));
     ImGui.end();
   }
 
-  public void setStatusVariables(float fps, float mspf) {
-    this.fps = fps;
-    this.mspf = mspf;
+  public <T> T getValue(String valueName) {
+    return (T) this.values.get(valueName);
   }
 
-  public float getSubdivisions() {
-    return this.subdivisions[0];
-  }
-
-  public float getFrequency() {
-    return this.frequency[0];
-  }
-  
-  public boolean getWireframe() {
-    return wireframe.get();
+  public <T> void setValue(String valueName, T object) {
+    this.values.put(valueName, object);
   }
 
   public void drawWindow() {

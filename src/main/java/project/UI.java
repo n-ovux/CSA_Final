@@ -1,15 +1,16 @@
 package project;
 
-import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.*;
+import java.lang.Math;
+
+import imgui.type.*;
 
 import org.joml.*;
 
-import java.lang.Math;
+import org.lwjgl.glfw.*;
+import org.lwjgl.opengl.*;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL43.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.opengl.GL43.*; import static org.lwjgl.system.MemoryUtil.*;
 
 public class UI {
   private long window;
@@ -114,7 +115,7 @@ public class UI {
     double lastTime = glfwGetTime();
     float secondTime = (float) glfwGetTime();
     int newFrames = 0;
-    float fps = 0;
+    int fps = 0;
     float mspf = 0;
     while (!glfwWindowShouldClose(window)) {
       double currentTime = glfwGetTime();
@@ -123,7 +124,7 @@ public class UI {
       secondTime += deltaTime;
       newFrames++;
       if (secondTime >= 1.0) {
-        fps = (float) (newFrames / secondTime);
+        fps = (int) (newFrames / secondTime);
         mspf = (float) (secondTime * 1000.0) / newFrames;
         newFrames = 0;
         secondTime = 0;
@@ -136,12 +137,13 @@ public class UI {
 
       processInput();
 
-      if (gui.getWireframe())
+      if (((ImBoolean) gui.getValue("wireframe")).get())
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-      gui.setStatusVariables(fps, mspf);
+      gui.setValue("fps", fps);
+      gui.setValue("mspf", mspf);
       gui.render();
 
       Matrix4f model = new Matrix4f();
@@ -154,8 +156,8 @@ public class UI {
       projection.setPerspective((float) Math.toRadians(camera.getFov()), (float) width / height, 0.01f, 100.0f);
 
       shader.bind();
-      noise.generateTexture(128, gui.getFrequency()).bind();
-      shader.setFloat("subdivisions", gui.getSubdivisions());
+      noise.generateTexture(128, ((float[]) gui.getValue("frequency"))[0]).bind();
+      shader.setFloat("subdivisions", ((float[]) gui.getValue("subdivisions"))[0]);
       shader.setMatrix4("model", model);
       shader.setMatrix4("view", view);
       shader.setMatrix4("projection", projection);
