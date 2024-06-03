@@ -17,6 +17,7 @@ public class Gui {
   private float fps;
   private float mspf;
   private float[] subdivisions = {1.0f};
+  private float[] frequency = {1.0f};
 
   // Config Variables
   private ImBoolean wireframe;
@@ -52,11 +53,12 @@ public class Gui {
     int flags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
     
     ImGui.setNextWindowPos(1.0f, 1.0f);
-    ImGui.setNextWindowSize(300.0f, 100.0f);
+    ImGui.setNextWindowSize(300.0f, 200.0f);
     ImGui.begin("Information", flags);
     ImGui.text("fps: " + (int) fps);
     ImGui.text("mspf: " + mspf);
     ImGui.sliderFloat("subdivisions", subdivisions, 0.0f, glGetFloat(GL_MAX_TESS_GEN_LEVEL));
+    ImGui.sliderFloat("frequency", frequency, 0.0f, 1.0f);
     ImGui.checkbox("Wireframe", wireframe);
     ImGui.end();
   }
@@ -68,6 +70,10 @@ public class Gui {
 
   public float getSubdivisions() {
     return this.subdivisions[0];
+  }
+
+  public float getFrequency() {
+    return this.frequency[0];
   }
   
   public boolean getWireframe() {

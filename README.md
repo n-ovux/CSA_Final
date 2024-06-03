@@ -25,3 +25,4 @@ imgui - library for making 2d guis
 [https://ahbejarano.gitbook.io/lwjglgamedev](https://ahbejarano.gitbook.io/lwjglgamedev)  
 [https://docs.gl/](https://docs.gl/)  
 [https://www.lwjgl.org/](https://www.lwjgl.org/)  
+[https://rtouti.github.io/graphics/perlin-noise-algorithm](https://rtouti.github.io/graphics/perlin-noise-algorithm)

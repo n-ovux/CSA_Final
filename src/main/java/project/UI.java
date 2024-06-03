@@ -2,11 +2,9 @@ package project;
 
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
 
 import org.joml.*;
 
-import java.nio.*;
 import java.lang.Math;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -97,35 +95,40 @@ public class UI {
     glViewport(0, 0, width, height);
 
     float planeVertices[] = new float[] {
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        1.0f, 1.0f, 0.0f,
-        -1.0f, 1.0f, 0.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+        1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, 0.0f, 0.0f, 1.0f
     };
 
     VertexArrayBuffer planeVab = new VertexArrayBuffer();
     planeVab.bind();
     planeVab.addVerticesBuffer(planeVertices);
     planeVab.addVertexAttribute(3, GL_FLOAT);
+    planeVab.addVertexAttribute(2, GL_FLOAT);
     planeVab.enableVertexAttributes();
 
-    Shader tessShader = new Shader("default.vert", "default.frag", "tessellation.tesc", "tessellation.tese");
+    Shader shader = new Shader("texture.vert", "texture.frag", "tessellation.tesc", "tessellation.tese");
+    Perlin noise = new Perlin(256);
 
     double lastTime = glfwGetTime();
+    float secondTime = (float) glfwGetTime();
     int newFrames = 0;
     float fps = 0;
     float mspf = 0;
     while (!glfwWindowShouldClose(window)) {
       double currentTime = glfwGetTime();
-      newFrames++;
       deltaTime = currentTime - lastTime;
-      if (deltaTime >= 1.0) {
-        fps = (float) (newFrames / deltaTime);
-        mspf = (float) (deltaTime * 1000.0) / newFrames;
+      lastTime = currentTime;
+      secondTime += deltaTime;
+      newFrames++;
+      if (secondTime >= 1.0) {
+        fps = (float) (newFrames / secondTime);
+        mspf = (float) (secondTime * 1000.0) / newFrames;
         newFrames = 0;
-        lastTime = currentTime;
+        secondTime = 0;
       }
-      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+      glClearColor(0.16f, 0.17f, 0.2f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       glEnable(GL_DEPTH_TEST);
@@ -150,11 +153,12 @@ public class UI {
       Matrix4f projection = new Matrix4f();
       projection.setPerspective((float) Math.toRadians(camera.getFov()), (float) width / height, 0.01f, 100.0f);
 
-      tessShader.bind();
-      tessShader.setFloat("subdivisions", gui.getSubdivisions());
-      tessShader.setMatrix4("model", model);
-      tessShader.setMatrix4("view", view);
-      tessShader.setMatrix4("projection", projection);
+      shader.bind();
+      noise.generateTexture(128, gui.getFrequency()).bind();
+      shader.setFloat("subdivisions", gui.getSubdivisions());
+      shader.setMatrix4("model", model);
+      shader.setMatrix4("view", view);
+      shader.setMatrix4("projection", projection);
       planeVab.bind();
       glPatchParameteri(GL_PATCH_VERTICES, 4);
       glDrawArrays(GL_PATCHES, 0, 4);
