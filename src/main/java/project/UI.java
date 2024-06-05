@@ -174,14 +174,13 @@ public class UI {
         glBindImageTexture(0, noiseTexture.getId(), 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
         glBindImageTexture(1, normalMap.getId(), 0, false, 0, GL_READ_ONLY, GL_RGBA32F);
         erosion.bind();
-        erosion.setInt("offset", ((int[]) gui.getValue("offset"))[0]);
         erosion.setFloat("depositionRate", ((float[]) gui.getValue("depositionRate"))[0]);
         erosion.setFloat("erosionRate", ((float[]) gui.getValue("erosionRate"))[0]);
-        erosion.setFloat("iterationScale", ((float[]) gui.getValue("iterationScale"))[0]);
         erosion.setFloat("friction", ((float[]) gui.getValue("friction"))[0]);
         erosion.setFloat("speed", ((float[]) gui.getValue("speed"))[0]);
         erosion.setInt("maxIterations", ((int[]) gui.getValue("maxIterations"))[0]);
-        glDispatchCompute(50, 50, 1);
+        erosion.setInt("drops", ((int[]) gui.getValue("drops"))[0]);
+        glDispatchCompute(50, 1, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
       }
 

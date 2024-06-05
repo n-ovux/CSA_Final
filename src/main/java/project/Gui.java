@@ -41,13 +41,12 @@ public class Gui {
     values.put("perlinNoise", Integer.valueOf(0));
     values.put("normalMap", Integer.valueOf(0));
 
-    values.put("offset", new int[] { 3 });
-    values.put("depositionRate", new float[] { 0.05f });
-    values.put("erosionRate", new float[] { 0.005f });
-    values.put("iterationScale", new float[] { 0.2f });
-    values.put("friction", new float[] { 0.2f });
+    values.put("depositionRate", new float[] { 1.0f });
+    values.put("erosionRate", new float[] { 1.0f });
+    values.put("friction", new float[] { 1.0f });
     values.put("speed", new float[] { 1.0f });
     values.put("maxIterations", new int[] { 80 });
+    values.put("drops", new int[] { 100 });
   }
 
   public boolean captureMouse() {
@@ -75,13 +74,12 @@ public class Gui {
     ImGui.sliderFloat("Subdivisions", (float[]) values.get("subdivisions"), 0.0f, glGetFloat(GL_MAX_TESS_GEN_LEVEL));
     ImGui.sliderFloat("Frequency", (float[]) values.get("frequency"), 0.0f, 1.0f, "%.3f", ImGuiSliderFlags.Logarithmic);
     ImGui.sliderInt("Octaves", (int[]) values.get("octaves"), 1, 5);
-    ImGui.sliderInt("Offset", (int[]) values.get("offset"), 1, 10);
     ImGui.sliderFloat("depositionRate", (float[]) values.get("depositionRate"), 0.0f, 1.0f);
     ImGui.sliderFloat("erosionRate", (float[]) values.get("erosionRate"), 0.0f, 1.0f);
-    ImGui.sliderFloat("iterationScale", (float[]) values.get("iterationScale"), 0.0f, 1.0f);
     ImGui.sliderFloat("friction", (float[]) values.get("friction"), 0.0f, 1.0f);
-    ImGui.sliderFloat("speed", (float[]) values.get("speed"), 0.0f, 1.0f);
+    ImGui.sliderFloat("speed", (float[]) values.get("speed"), 0.0f, 10.0f);
     ImGui.sliderInt("maxIterations", (int[]) values.get("maxIterations"), 1, 100);
+    ImGui.sliderInt("drops", (int[]) values.get("drops"), 1, 500);
     ImGui.checkbox("Wireframe", (ImBoolean) values.get("wireframe"));
     ImGui.checkbox("Erosion", (ImBoolean) values.get("erosion"));
     ImGui.text("Perlin Noise:");
