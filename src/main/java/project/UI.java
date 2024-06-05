@@ -10,7 +10,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL43.*; 
+import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class UI {
@@ -60,7 +60,7 @@ public class UI {
   }
 
   private void processInput() {
-    if (!gui.captureKeyboard()) {
+    if (!gui.captureKeyboard() && !mouseFree) {
       if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         mouseFree = true;
@@ -113,6 +113,8 @@ public class UI {
     Shader shader = new Shader("texture.vert", "texture.frag", "tessellation.tesc", "tessellation.tese");
     Perlin noise = new Perlin(256);
 
+    Shader sobel = new Shader("sobel.comp");
+
     double lastTime = glfwGetTime();
     float secondTime = (float) glfwGetTime();
     int newFrames = 0;
@@ -156,12 +158,22 @@ public class UI {
       Matrix4f projection = new Matrix4f();
       projection.setPerspective((float) Math.toRadians(camera.getFov()), (float) width / height, 0.01f, 100.0f);
 
-      Texture noiseTexture = noise.generateTexture(128, ((float[]) gui.getValue("frequency"))[0], 5);
+      Texture noiseTexture = noise.generateTexture(128, ((float[]) gui.getValue("frequency"))[0],
+          ((int[]) gui.getValue("octaves"))[0]);
+      Texture normalMap = new Texture(128, 128, GL_RGBA32F, GL_RGBA, GL_FLOAT, GL_LINEAR);
+      glBindImageTexture(0, noiseTexture.getId(), 0, false, 0, GL_READ_ONLY, GL_RGBA32F);
+      glBindImageTexture(1, normalMap.getId(), 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+      sobel.bind();
+      glDispatchCompute(128, 128, 1);
+      glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
       gui.setValue("perlinNoise", noiseTexture.getId());
+      gui.setValue("normalMap", normalMap.getId());
 
       shader.bind();
-      noiseTexture.bind(0);
-      shader.setInt("heightMap", 0);
+      noiseTexture.bind(2);
+      shader.setInt("heightMap", 2);
       shader.setFloat("subdivisions", ((float[]) gui.getValue("subdivisions"))[0]);
       shader.setMatrix4("model", model);
       shader.setMatrix4("view", view);
@@ -172,6 +184,9 @@ public class UI {
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       gui.drawWindow();
+
+      noiseTexture.delete();
+      normalMap.delete();
 
       glfwSwapBuffers(window);
       glfwPollEvents();

@@ -32,11 +32,13 @@ public class Gui {
     this.values = new Hashtable();
 
     values.put("subdivisions", new float[] { glGetFloat(GL_MAX_TESS_GEN_LEVEL) });
-    values.put("frequency", new float[] { 0.02f });
+    values.put("frequency", new float[] { 0.01f });
+    values.put("octaves", new int[] { 5 });
     values.put("wireframe", new ImBoolean(false));
     values.put("fps", Integer.valueOf(0));
     values.put("mspf", Float.valueOf(0.0f));
     values.put("perlinNoise", Integer.valueOf(0));
+    values.put("normalMap", Integer.valueOf(0));
   }
 
   public boolean captureMouse() {
@@ -57,14 +59,20 @@ public class Gui {
         | ImGuiWindowFlags.NoResize;
 
     ImGui.setNextWindowPos(1.0f, 1.0f);
-    ImGui.setNextWindowSize(300.0f, 250.0f);
+    ImGui.setNextWindowSize(285.0f, 290.0f);
     ImGui.begin("Information", flags);
     ImGui.text("fps: " + values.get("fps"));
     ImGui.text("mspf: " + values.get("mspf"));
-    ImGui.sliderFloat("subdivisions", (float[]) values.get("subdivisions"), 0.0f, glGetFloat(GL_MAX_TESS_GEN_LEVEL));
-    ImGui.sliderFloat("frequency", (float[]) values.get("frequency"), 0.0f, 1.0f, "%.3f", ImGuiSliderFlags.Logarithmic);
+    ImGui.sliderFloat("Subdivisions", (float[]) values.get("subdivisions"), 0.0f, glGetFloat(GL_MAX_TESS_GEN_LEVEL));
+    ImGui.sliderFloat("Frequency", (float[]) values.get("frequency"), 0.0f, 1.0f, "%.3f", ImGuiSliderFlags.Logarithmic);
+    ImGui.sliderInt("Octaves", (int[]) values.get("octaves"), 1, 5);
     ImGui.checkbox("Wireframe", (ImBoolean) values.get("wireframe"));
+    ImGui.text("Perlin Noise:");
+    ImGui.sameLine(140.0f);
+    ImGui.text("Sobel Filter:");
     ImGui.image(((Integer) values.get("perlinNoise")), 128.0f, 128.0f);
+    ImGui.sameLine();
+    ImGui.image(((Integer) values.get("normalMap")), 128.0f, 128.0f);
     ImGui.end();
   }
 

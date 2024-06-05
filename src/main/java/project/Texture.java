@@ -56,11 +56,12 @@ public class Texture {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, NULL);
+    // glTexStorage2D(GL_TEXTURE_2D, 1, internalFormat, width, height);
 
     glBindTexture(GL_TEXTURE_2D, 0);
   }
 
-  public Texture(int width, int height, int format, int type, float[] pixels, int filter) {
+  public Texture(int width, int height, int internalFormat, int format, int type, float[] pixels, int filter) {
     this.width = width;
     this.height = height;
 
@@ -73,18 +74,18 @@ public class Texture {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, type, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, pixels);
 
     glBindTexture(GL_TEXTURE_2D, 0);
   }
 
   public void bind(int textureUnit) {
-    glActiveTexture(textureUnit);
+    glActiveTexture(GL_TEXTURE0 + textureUnit);
     glBindTexture(GL_TEXTURE_2D, Id);
   }
 
-  public void unbind() {
-    glBindTexture(GL_TEXTURE_2D, 0);
+  public void delete() {
+    glDeleteTextures(Id);
   }
 
   public int getId() {
