@@ -1,0 +1,48 @@
+#version 430
+
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+uniform layout(binding = 0, rgba32f) image2D perlinNoise;
+uniform layout(binding = 1, rgba32f) readonly image2D normalMap;
+
+uniform int offset;
+uniform float depositionRate;
+uniform float erosionRate;
+uniform float iterationScale;
+uniform float friction;
+uniform float speed;
+uniform int maxIterations;
+void main()
+{
+    ivec2 position = offset * ivec2(gl_GlobalInvocationID.xy);
+
+    float sediment = 0.0;
+    ivec2 previousPosition = position;
+    vec2 velocity = vec2(0.0);
+
+    // float depositionRate = 0.03;
+    // float erosionRate = 0.04;
+    // float iterationScale = 0.04;
+    // float friction = 0.7;
+    // float speed = 1.0;
+
+    // int maxIterations = 80;
+
+    for (int i = 0; i < maxIterations; ++i) {
+        vec3 normal = imageLoad(normalMap, position).xyz;
+        // i += maxIterations * int(step(1, normal.z));
+        float deposit = sediment * depositionRate * normal.y;
+        float erosion = erosionRate * (1.0 - normal.y) * min(1, i * iterationScale);
+
+        float height = imageLoad(perlinNoise, position).r;
+        float newHeight = height.r + (deposit - erosion);
+
+        imageStore(perlinNoise, position, vec4(1.0) * newHeight);
+        sediment += erosion - deposit;
+
+        // velocity = velocity * friction + normal.xz * speed;
+        velocity.x = friction * velocity.x + normal.x * speed;
+        velocity.y = friction * velocity.y + normal.y * speed;
+        previousPosition = position;
+        position += ivec2(velocity);
+    }
+}

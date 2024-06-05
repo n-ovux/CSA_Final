@@ -32,13 +32,22 @@ public class Gui {
     this.values = new Hashtable();
 
     values.put("subdivisions", new float[] { glGetFloat(GL_MAX_TESS_GEN_LEVEL) });
-    values.put("frequency", new float[] { 0.01f });
+    values.put("frequency", new float[] { 0.006f });
     values.put("octaves", new int[] { 5 });
     values.put("wireframe", new ImBoolean(false));
+    values.put("erosion", new ImBoolean(true));
     values.put("fps", Integer.valueOf(0));
     values.put("mspf", Float.valueOf(0.0f));
     values.put("perlinNoise", Integer.valueOf(0));
     values.put("normalMap", Integer.valueOf(0));
+
+    values.put("offset", new int[] { 3 });
+    values.put("depositionRate", new float[] { 0.05f });
+    values.put("erosionRate", new float[] { 0.005f });
+    values.put("iterationScale", new float[] { 0.2f });
+    values.put("friction", new float[] { 0.2f });
+    values.put("speed", new float[] { 1.0f });
+    values.put("maxIterations", new int[] { 80 });
   }
 
   public boolean captureMouse() {
@@ -59,17 +68,25 @@ public class Gui {
         | ImGuiWindowFlags.NoResize;
 
     ImGui.setNextWindowPos(1.0f, 1.0f);
-    ImGui.setNextWindowSize(285.0f, 290.0f);
+    ImGui.setNextWindowSize(360.0f, 480.0f);
     ImGui.begin("Information", flags);
     ImGui.text("fps: " + values.get("fps"));
     ImGui.text("mspf: " + values.get("mspf"));
     ImGui.sliderFloat("Subdivisions", (float[]) values.get("subdivisions"), 0.0f, glGetFloat(GL_MAX_TESS_GEN_LEVEL));
     ImGui.sliderFloat("Frequency", (float[]) values.get("frequency"), 0.0f, 1.0f, "%.3f", ImGuiSliderFlags.Logarithmic);
     ImGui.sliderInt("Octaves", (int[]) values.get("octaves"), 1, 5);
+    ImGui.sliderInt("Offset", (int[]) values.get("offset"), 1, 10);
+    ImGui.sliderFloat("depositionRate", (float[]) values.get("depositionRate"), 0.0f, 1.0f);
+    ImGui.sliderFloat("erosionRate", (float[]) values.get("erosionRate"), 0.0f, 1.0f);
+    ImGui.sliderFloat("iterationScale", (float[]) values.get("iterationScale"), 0.0f, 1.0f);
+    ImGui.sliderFloat("friction", (float[]) values.get("friction"), 0.0f, 1.0f);
+    ImGui.sliderFloat("speed", (float[]) values.get("speed"), 0.0f, 1.0f);
+    ImGui.sliderInt("maxIterations", (int[]) values.get("maxIterations"), 1, 100);
     ImGui.checkbox("Wireframe", (ImBoolean) values.get("wireframe"));
+    ImGui.checkbox("Erosion", (ImBoolean) values.get("erosion"));
     ImGui.text("Perlin Noise:");
     ImGui.sameLine(140.0f);
-    ImGui.text("Sobel Filter:");
+    ImGui.text("Normal Map:");
     ImGui.image(((Integer) values.get("perlinNoise")), 128.0f, 128.0f);
     ImGui.sameLine();
     ImGui.image(((Integer) values.get("normalMap")), 128.0f, 128.0f);

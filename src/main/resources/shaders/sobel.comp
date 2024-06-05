@@ -8,8 +8,6 @@ void main()
 {
     ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
 
-    vec4 value = imageLoad(perlinNoise, texelCoord);
-
     ivec2 offsets[9] = ivec2[](
             ivec2(-1, 1), // top-left
             ivec2(0, 1), // top-center
@@ -22,10 +20,11 @@ void main()
             ivec2(1, -1) // bottom-right
         );
 
-    vec3 sampledData[9];
+    float sampledData[9];
     for (int i = 0; i < 9; i++)
     {
-        sampledData[i] = vec3(imageLoad(perlinNoise, texelCoord + offsets[i]));
+        vec3 color = imageLoad(perlinNoise, texelCoord + offsets[i]).rgb;
+        sampledData[i] = (color.r + color.g + color.b) / 3.0;
     }
 
     float gradientXKernel[9] = float[](
@@ -42,9 +41,10 @@ void main()
 
     vec3 gradient = vec3(0.0);
     for (int i = 0; i < 9; i++) {
-        gradient.g += (sampledData[i] * gradientXKernel[i]).x;
-        gradient.b += (sampledData[i] * gradientYKernel[i]).x;
+        gradient.r += sampledData[i] * gradientXKernel[i];
+        gradient.g += sampledData[i] * gradientYKernel[i];
     }
+    gradient.b += sqrt(1.0 - dot(gradient.rg, gradient.rg));
     gradient *= 1 - step(127, texelCoord.x);
     gradient *= step(1, texelCoord.y);
 

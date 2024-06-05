@@ -114,6 +114,7 @@ public class UI {
     Perlin noise = new Perlin(256);
 
     Shader sobel = new Shader("sobel.comp");
+    Shader erosion = new Shader("erosion.comp");
 
     double lastTime = glfwGetTime();
     float secondTime = (float) glfwGetTime();
@@ -150,7 +151,7 @@ public class UI {
       gui.render();
 
       Matrix4f model = new Matrix4f();
-      model.scale(20.0f, 1.0f, 20.0f);
+      model.scale(10.0f, 1.0f, 10.0f);
       model.rotate((float) Math.toRadians(90), 1.0f, 0.0f, 0.0f);
       model.translate(0.0f, 0.0f, 0.5f);
       Matrix4f view = new Matrix4f();
@@ -158,15 +159,31 @@ public class UI {
       Matrix4f projection = new Matrix4f();
       projection.setPerspective((float) Math.toRadians(camera.getFov()), (float) width / height, 0.01f, 100.0f);
 
-      Texture noiseTexture = noise.generateTexture(128, ((float[]) gui.getValue("frequency"))[0],
+      final int TEXTURE_SIZE = 128;
+      Texture noiseTexture = noise.generateTexture(TEXTURE_SIZE, ((float[]) gui.getValue("frequency"))[0],
           ((int[]) gui.getValue("octaves"))[0]);
-      Texture normalMap = new Texture(128, 128, GL_RGBA32F, GL_RGBA, GL_FLOAT, GL_LINEAR);
+      Texture normalMap = new Texture(TEXTURE_SIZE, TEXTURE_SIZE, GL_RGBA32F, GL_RGBA, GL_FLOAT, GL_LINEAR);
+
       glBindImageTexture(0, noiseTexture.getId(), 0, false, 0, GL_READ_ONLY, GL_RGBA32F);
       glBindImageTexture(1, normalMap.getId(), 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
-
       sobel.bind();
-      glDispatchCompute(128, 128, 1);
+      glDispatchCompute(TEXTURE_SIZE, TEXTURE_SIZE, 1);
       glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+      if (((ImBoolean) gui.getValue("erosion")).get()) {
+        glBindImageTexture(0, noiseTexture.getId(), 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+        glBindImageTexture(1, normalMap.getId(), 0, false, 0, GL_READ_ONLY, GL_RGBA32F);
+        erosion.bind();
+        erosion.setInt("offset", ((int[]) gui.getValue("offset"))[0]);
+        erosion.setFloat("depositionRate", ((float[]) gui.getValue("depositionRate"))[0]);
+        erosion.setFloat("erosionRate", ((float[]) gui.getValue("erosionRate"))[0]);
+        erosion.setFloat("iterationScale", ((float[]) gui.getValue("iterationScale"))[0]);
+        erosion.setFloat("friction", ((float[]) gui.getValue("friction"))[0]);
+        erosion.setFloat("speed", ((float[]) gui.getValue("speed"))[0]);
+        erosion.setInt("maxIterations", ((int[]) gui.getValue("maxIterations"))[0]);
+        glDispatchCompute(50, 50, 1);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+      }
 
       gui.setValue("perlinNoise", noiseTexture.getId());
       gui.setValue("normalMap", normalMap.getId());
